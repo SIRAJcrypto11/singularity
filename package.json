@@ -1,0 +1,62 @@
+{
+  "name": "snishop-llm",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "tauri": "tauri",
+    "build-exe": "node build-exe.js"
+  },
+  "build": {
+    "appId": "com.snishop.elite",
+    "productName": "Singularity Elite V7",
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone"
+      }
+    ],
+    "win": {
+      "target": "dir"
+    }
+  },
+  "dependencies": {
+    "@types/file-saver": "^2.0.7",
+    "axios": "^1.7.9",
+    "clsx": "^2.1.1",
+    "dexie": "4.0.10",
+    "file-saver": "^2.0.5",
+    "framer-motion": "^12.0.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
+    "lucide-react": "^0.473.0",
+    "next": "15.1.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "tailwind-merge": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.1.0",
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^10.1.0",
+    "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2",
+    "postcss": "^8.4.49",
+    "tailwindcss": "3.4.1",
+    "typescript": "5.7.2"
+  }
+}
