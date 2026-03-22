@@ -74,8 +74,11 @@ export async function POST(req: Request) {
     // Send verification email
     try {
       await sendVerificationEmail(email, verificationToken);
-    } catch (emailErr) {
+    } catch (emailErr: any) {
       console.error("Failed to send verification email", emailErr);
+      return NextResponse.json({ 
+        error: `Failed to send verification email: ${emailErr.message || 'Unknown SMTP Error'}. Please contact support.` 
+      }, { status: 500 });
     }
 
     return NextResponse.json({ 

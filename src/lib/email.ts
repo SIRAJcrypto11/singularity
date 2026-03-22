@@ -5,7 +5,7 @@ const SMTP_HOST = process.env.SMTP_HOST || 'smtp.hostinger.com';
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465');
 const SMTP_USER = process.env.SMTP_USER || 'sirajnurihrom@snishop.com';
 const SMTP_PASS = process.env.SMTP_PASS || ''; // User needs to provide this
-const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@snishop.com';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'sirajnurihrom@snishop.com';
 
 export const transporter = nodemailer.createTransport({
   host: SMTP_HOST,
