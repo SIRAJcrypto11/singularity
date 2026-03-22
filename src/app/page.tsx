@@ -85,7 +85,7 @@ export default function LandingPage() {
       {/* ===== NAVBAR ===== */}
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled ? "bg-black/60 backdrop-blur-2xl border-b border-white/[0.06] shadow-lg shadow-black/20" : "bg-transparent border-b border-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between">
-          <a href="/landing" className="flex items-center gap-0.5 group">
+          <a href="/" className="flex items-center gap-0.5 group">
             <span className="text-2xl font-[900] tracking-[-0.05em] text-white transition-all group-hover:text-violet-300">Log</span>
             <span className="text-2xl font-[900] tracking-[-0.05em] text-violet-500 transition-all group-hover:text-violet-400">Fi</span>
           </a>
