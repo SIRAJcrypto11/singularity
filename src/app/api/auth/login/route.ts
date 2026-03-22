@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { readDb } from '@/lib/db-server';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'singularity_v7_fallback_secret_key';
+import { readDb, writeDb, addAuditLog } from '@/lib/db-server';
+import { createAuthToken } from '@/lib/auth-utils';
 
 export async function POST(req: Request) {
   try {
@@ -24,22 +22,46 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Please verify your email before logging in.' }, { status: 403 });
     }
 
+    if (user.status === 'suspended' || user.status === 'banned') {
+      return NextResponse.json({ error: 'Your account has been suspended. Contact support.' }, { status: 403 });
+    }
+
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // Create JWT
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Update login metadata
+    user.lastLoginAt = new Date().toISOString();
+    user.loginCount = (user.loginCount || 0) + 1;
+    await writeDb(db);
+
+    // Create JWT with role and tier
+    const token = createAuthToken({
+      id: user.id,
+      email: user.email,
+      role: user.role || 'user',
+      tier: user.tier || 'free',
+    });
+
+    // Audit log
+    await addAuditLog({
+      userId: user.id,
+      action: 'USER_LOGIN',
+      details: `${email} logged in`,
+    });
 
     const response = NextResponse.json({
       success: true,
-      user: { id: user.id, email: user.email }
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName || email.split('@')[0],
+        role: user.role || 'user',
+        tier: user.tier || 'free',
+        subscription: user.subscription || { tier: 'free', startDate: user.createdAt, endDate: null, autoRenew: false },
+      }
     });
 
     // Set cookie

@@ -1,47 +1,45 @@
 import { NextResponse } from 'next/server';
-import { ensureDb, readDb, writeDb } from '@/lib/db-server';
+import { ensureDb, getUserData, writeUserData, readDb, writeDb } from '@/lib/db-server';
+import { getUserFromRequest } from '@/lib/auth-utils';
 
-export async function GET() {
+export async function GET(req: Request) {
   await ensureDb();
-  let parsed = await readDb();
   
-  if (Array.isArray(parsed.finance)) {
-    parsed.finance = {
-      transactions: parsed.finance,
+  const jwtUser = getUserFromRequest(req);
+  
+  if (!jwtUser) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  const data = await getUserData(jwtUser.userId);
+  
+  // Normalize finance structure
+  if (Array.isArray(data.finance)) {
+    data.finance = {
+      transactions: data.finance,
       accounts: [{ id: 'acc-main', name: 'Main Wallet', balance: 0, type: 'wallet', color: 'violet' }],
       categories: [], debts: [], customLists: ['Personal', 'Work']
     };
-    await writeDb(parsed);
+    await writeUserData(jwtUser.userId, data);
   }
   
-  if (!parsed.finance.customLists) parsed.finance.customLists = ['Personal', 'Work'];
+  if (!data.finance.customLists) data.finance.customLists = ['Personal', 'Work'];
   
-  if (!parsed.finance.categories || parsed.finance.categories.length === 0) {
-    parsed.finance.categories = [
-      { id: 'cat-inc-1', name: 'Penjualan', type: 'income', color: 'emerald', keywords: ['penjualan','jual','sales'] },
-      { id: 'cat-inc-2', name: 'Gaji', type: 'income', color: 'blue', keywords: ['gaji','salary','upah'] },
-      { id: 'cat-inc-3', name: 'Pemasukan Lain', type: 'income', color: 'cyan', keywords: ['masuk','pemasukan','terima'] },
-      { id: 'cat-exp-1', name: 'Makan', type: 'expense', color: 'rose', keywords: ['makan','makanan','food','sahur','buka'] },
-      { id: 'cat-exp-2', name: 'Transport', type: 'expense', color: 'amber', keywords: ['transport','bensin','grab','gojek','ojek','parkir'] },
-      { id: 'cat-exp-3', name: 'Belanja', type: 'expense', color: 'pink', keywords: ['beli','belanja','buat','bayar'] },
-      { id: 'cat-exp-4', name: 'Tagihan', type: 'expense', color: 'orange', keywords: ['tagihan','listrik','wifi','token','pulsa','internet'] },
-      { id: 'cat-exp-5', name: 'Hiburan', type: 'expense', color: 'violet', keywords: ['hiburan','nonton','game','langganan'] }
-    ];
-    await writeDb(parsed);
-  }
-  
-  if (!parsed.habits) parsed.habits = [];
-  if (!parsed.dailyLogs) parsed.dailyLogs = [];
-  if (!parsed.users) parsed.users = [];
-  
-  return NextResponse.json(parsed);
+  return NextResponse.json(data);
 }
 
 export async function POST(req: Request) {
   try {
     await ensureDb();
+    
+    const jwtUser = getUserFromRequest(req);
+    
+    if (!jwtUser) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     const payload = await req.json();
-    const currentData = await readDb();
+    const currentData = await getUserData(jwtUser.userId);
     
     if (Array.isArray(currentData.finance)) {
       currentData.finance = { transactions: currentData.finance, accounts: [], categories: [], debts: [], customLists: ['Personal', 'Work'] };
@@ -134,7 +132,7 @@ export async function POST(req: Request) {
         currentData.habits = currentData.habits.filter((h: any) => h.id !== data.id);
         break;
       
-      // DAILY LOG (Mood/Reflection)
+      // DAILY LOG
       case 'DAILY_LOG':
         if (!currentData.dailyLogs) currentData.dailyLogs = [];
         const lid = currentData.dailyLogs.findIndex((l: any) => l.date === data.date);
@@ -143,7 +141,7 @@ export async function POST(req: Request) {
         break;
     }
 
-    await writeDb(currentData);
+    await writeUserData(jwtUser.userId, currentData);
     return NextResponse.json({ success: true, data: currentData });
   } catch (error) {
     console.error("POST Error", error);

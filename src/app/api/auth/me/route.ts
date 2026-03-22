@@ -1,31 +1,38 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import { readDb } from '@/lib/db-server';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'singularity_v7_fallback_secret_key';
+import { getUserFromRequest, getFullUser } from '@/lib/auth-utils';
 
 export async function GET(req: Request) {
   try {
-    const token = req.headers.get('cookie')
-      ?.split('; ')
-      .find(c => c.startsWith('auth_token='))
-      ?.split('=')[1];
+    const jwtUser = getUserFromRequest(req);
 
-    if (!token) {
+    if (!jwtUser) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
 
-    const decoded: any = jwt.verify(token, JWT_SECRET);
-    const db = await readDb();
-    const user = db.users.find((u: any) => u.id === decoded.userId);
+    // Get fresh user data from DB (role/tier might have changed)
+    const user = await getFullUser(jwtUser.userId);
 
     if (!user) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
 
+    if (user.status === 'suspended' || user.status === 'banned') {
+      return NextResponse.json({ authenticated: false, error: 'Account suspended' }, { status: 403 });
+    }
+
     return NextResponse.json({
       authenticated: true,
-      user: { id: user.id, email: user.email }
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName || user.email.split('@')[0],
+        role: user.role || 'user',
+        tier: user.tier || 'free',
+        subscription: user.subscription || { tier: 'free', startDate: user.createdAt, endDate: null, autoRenew: false },
+        createdAt: user.createdAt,
+        lastLoginAt: user.lastLoginAt,
+        loginCount: user.loginCount || 0,
+      }
     });
 
   } catch (error) {
