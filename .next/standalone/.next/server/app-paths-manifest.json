@@ -1,0 +1,15 @@
+{
+  "/api/assistant/route": "app/api/assistant/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/register/route": "app/api/auth/register/route.js",
+  "/api/auth/verify/route": "app/api/auth/verify/route.js",
+  "/api/admin/users/route": "app/api/admin/users/route.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/api/auth/logout/route": "app/api/auth/logout/route.js",
+  "/api/data/route": "app/api/data/route.js",
+  "/page": "app/page.js",
+  "/elite/page": "app/elite/page.js",
+  "/auth/page": "app/auth/page.js",
+  "/app/page": "app/app/page.js"
+}
