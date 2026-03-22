@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     await writeDb(db);
 
     // Prepare redirect or simple success HTML
-    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/?auth=login`;
+    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth?mode=login`;
     
     return new NextResponse(`
       <div style="font-family: sans-serif; text-align: center; padding: 50px;">
