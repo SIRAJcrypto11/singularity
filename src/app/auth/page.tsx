@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Bot, RefreshCw } from "lucide-react";
 import axios from "axios";
 
-export default function RootEntry() {
+function AuthContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [authLoading, setAuthLoading] = useState(false);
@@ -14,6 +15,10 @@ export default function RootEntry() {
   const [authSuccess, setAuthSuccess] = useState("");
 
   useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'register') setAuthMode('register');
+    else setAuthMode('login');
+
     const checkAuth = async () => {
       try {
         const res = await axios.get('/api/auth/me');
@@ -27,7 +32,7 @@ export default function RootEntry() {
       }
     };
     checkAuth();
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,9 +65,6 @@ export default function RootEntry() {
     );
   }
 
-  // The landing page handles its own view via /landing route,
-  // but if they come to /, we show the Auth Overlay.
-  // We can add a "Back to Website" button.
   return (
     <div className="h-screen bg-[#050506] relative overflow-hidden flex items-center justify-center">
       {/* Background decorations matching landing page */}
@@ -145,5 +147,13 @@ export default function RootEntry() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RootEntry() {
+  return (
+    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-[#050506]"><RefreshCw className="animate-spin text-violet-500" /></div>}>
+      <AuthContent />
+    </Suspense>
   );
 }

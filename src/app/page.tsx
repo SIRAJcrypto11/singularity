@@ -95,9 +95,9 @@ export default function LandingPage() {
             ))}
           </div>
           <div className="hidden md:flex items-center gap-4">
-            <a href="/" className="text-[10px] font-[800] uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">Masuk</a>
+            <a href="/auth?mode=login" className="text-[10px] font-[800] uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">Masuk</a>
             {/* Separated CTA icon (Nuraform-style) */}
-            <a href="/" className="flex items-center gap-0 group">
+            <a href="/auth?mode=register" className="flex items-center gap-0 group">
               <span className="bg-violet-600 group-hover:bg-violet-500 text-white text-[9px] font-[900] uppercase tracking-[0.15em] px-6 py-3 rounded-l-full transition-all btn-shimmer">
                 Mulai Gratis
               </span>
@@ -115,7 +115,7 @@ export default function LandingPage() {
             {[["#features","Fitur"],["#how-it-works","Cara Kerja"],["#pricing","Harga"],["#testimonials","Testimoni"]].map(([href,label])=>(
               <a key={href} href={href} onClick={()=>setMobileMenu(false)} className="block text-sm font-bold text-zinc-300 hover:text-white">{label}</a>
             ))}
-            <a href="/" className="block w-full text-center bg-violet-600 text-white text-sm font-[900] py-3 rounded-xl mt-4">Mulai Gratis →</a>
+            <a href="/auth?mode=register" className="block w-full text-center bg-violet-600 text-white text-sm font-[900] py-3 rounded-xl mt-4">Mulai Gratis →</a>
           </div>
         )}
       </nav>
@@ -151,7 +151,7 @@ export default function LandingPage() {
 
             <div className="anim-hidden anim-delay-4 flex flex-wrap items-center gap-4">
               {/* Separated CTA icon */}
-              <a href="/" className="flex items-center gap-0 group">
+              <a href="/auth?mode=register" className="flex items-center gap-0 group">
                 <span className="bg-violet-600 group-hover:bg-violet-500 text-white text-[10px] font-[900] uppercase tracking-[0.15em] px-8 py-4 rounded-l-2xl transition-all btn-shimmer animate-cta-pulse">
                   Mulai Gratis
                 </span>
@@ -495,7 +495,7 @@ export default function LandingPage() {
                   <li key={i} className="flex items-center gap-2.5 text-[13px] text-zinc-400"><CheckCircle2 size={13} className="text-emerald-500/70 shrink-0"/>{f}</li>
                 ))}
               </ul>
-              <a href="/" className="block w-full text-center border border-white/10 hover:border-violet-500/30 text-zinc-300 hover:text-white py-4 rounded-xl font-[900] text-[10px] uppercase tracking-[0.15em] transition-all">Mulai Gratis</a>
+              <a href="/auth?mode=register" className="block w-full text-center border border-white/10 hover:border-violet-500/30 text-zinc-300 hover:text-white py-4 rounded-xl font-[900] text-[10px] uppercase tracking-[0.15em] transition-all">Mulai Gratis</a>
             </div>
             {/* Pro */}
             <div className="anim-hidden anim-delay-2 relative bg-gradient-to-b from-violet-600/[0.06] to-transparent border border-violet-500/20 rounded-2xl p-8 space-y-6 hover:-translate-y-2 hover:border-violet-500/40 transition-all duration-500 shadow-xl shadow-violet-500/[0.05]">
@@ -512,7 +512,7 @@ export default function LandingPage() {
                   <li key={i} className="flex items-center gap-2.5 text-[13px] text-zinc-300"><CheckCircle2 size={13} className="text-violet-500 shrink-0"/>{f}</li>
                 ))}
               </ul>
-              <a href="/" className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white py-4 rounded-xl font-[900] text-[10px] uppercase tracking-[0.15em] shadow-lg shadow-violet-500/20 transition-all hover:-translate-y-0.5 btn-shimmer">Upgrade ke Pro →</a>
+              <a href="/auth?mode=register" className="block w-full text-center bg-violet-600 hover:bg-violet-500 text-white py-4 rounded-xl font-[900] text-[10px] uppercase tracking-[0.15em] shadow-lg shadow-violet-500/20 transition-all hover:-translate-y-0.5 btn-shimmer">Upgrade ke Pro →</a>
             </div>
           </div>
         </div>
@@ -538,7 +538,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <a href="/" className="anim-hidden anim-delay-3 inline-flex items-center gap-0 group">
+          <a href="/auth?mode=register" className="anim-hidden anim-delay-3 inline-flex items-center gap-0 group">
             <span className="bg-violet-600 group-hover:bg-violet-500 text-white text-[10px] font-[900] uppercase tracking-[0.15em] px-10 py-5 rounded-l-2xl transition-all btn-shimmer animate-cta-pulse">
               Mulai Gratis Sekarang
             </span>
