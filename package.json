@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri",
-    "build-exe": "node build-exe.js"
+    "build-exe": "node build-exe.js",
+    "postinstall": "npm run build"
   },
   "build": {
     "appId": "com.snishop.elite",
