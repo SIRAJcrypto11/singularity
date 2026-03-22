@@ -99,7 +99,7 @@ export default function LandingPage() {
             {/* Separated CTA icon (Nuraform-style) */}
             <a href="/auth?mode=register" className="flex items-center gap-0 group">
               <span className="bg-violet-600 group-hover:bg-violet-500 text-white text-[9px] font-[900] uppercase tracking-[0.15em] px-6 py-3 rounded-l-full transition-all btn-shimmer">
-                Mulai Gratis
+                Daftar
               </span>
               <span className="bg-violet-500 group-hover:bg-violet-400 text-white w-10 h-10 rounded-full flex items-center justify-center -ml-2 shadow-lg shadow-violet-500/30 transition-all group-hover:-translate-y-0.5">
                 <ArrowRight size={14} strokeWidth={3}/>
@@ -115,7 +115,7 @@ export default function LandingPage() {
             {[["#features","Fitur"],["#how-it-works","Cara Kerja"],["#pricing","Harga"],["#testimonials","Testimoni"]].map(([href,label])=>(
               <a key={href} href={href} onClick={()=>setMobileMenu(false)} className="block text-sm font-bold text-zinc-300 hover:text-white">{label}</a>
             ))}
-            <a href="/auth?mode=register" className="block w-full text-center bg-violet-600 text-white text-sm font-[900] py-3 rounded-xl mt-4">Mulai Gratis →</a>
+            <a href="/auth?mode=register" className="block w-full text-center bg-violet-600 text-white text-sm font-[900] py-3 rounded-xl mt-4">Daftar Sekarang →</a>
           </div>
         )}
       </nav>
@@ -153,7 +153,7 @@ export default function LandingPage() {
               {/* Separated CTA icon */}
               <a href="/auth?mode=register" className="flex items-center gap-0 group">
                 <span className="bg-violet-600 group-hover:bg-violet-500 text-white text-[10px] font-[900] uppercase tracking-[0.15em] px-8 py-4 rounded-l-2xl transition-all btn-shimmer animate-cta-pulse">
-                  Mulai Gratis
+                  Daftar
                 </span>
                 <span className="bg-violet-500 group-hover:bg-violet-400 text-white w-14 h-14 rounded-full flex items-center justify-center -ml-3 shadow-xl shadow-violet-500/30 transition-all group-hover:-translate-y-1 group-hover:scale-105 border-2 border-violet-400/20">
                   <ArrowRight size={18} strokeWidth={3}/>
@@ -495,7 +495,7 @@ export default function LandingPage() {
                   <li key={i} className="flex items-center gap-2.5 text-[13px] text-zinc-400"><CheckCircle2 size={13} className="text-emerald-500/70 shrink-0"/>{f}</li>
                 ))}
               </ul>
-              <a href="/auth?mode=register" className="block w-full text-center border border-white/10 hover:border-violet-500/30 text-zinc-300 hover:text-white py-4 rounded-xl font-[900] text-[10px] uppercase tracking-[0.15em] transition-all">Mulai Gratis</a>
+              <a href="/auth?mode=register" className="block w-full text-center border border-white/10 hover:border-violet-500/30 text-zinc-300 hover:text-white py-4 rounded-xl font-[900] text-[10px] uppercase tracking-[0.15em] transition-all">Daftar Gratis</a>
             </div>
             {/* Pro */}
             <div className="anim-hidden anim-delay-2 relative bg-gradient-to-b from-violet-600/[0.06] to-transparent border border-violet-500/20 rounded-2xl p-8 space-y-6 hover:-translate-y-2 hover:border-violet-500/40 transition-all duration-500 shadow-xl shadow-violet-500/[0.05]">
@@ -540,7 +540,7 @@ export default function LandingPage() {
 
           <a href="/auth?mode=register" className="anim-hidden anim-delay-3 inline-flex items-center gap-0 group">
             <span className="bg-violet-600 group-hover:bg-violet-500 text-white text-[10px] font-[900] uppercase tracking-[0.15em] px-10 py-5 rounded-l-2xl transition-all btn-shimmer animate-cta-pulse">
-              Mulai Gratis Sekarang
+              Daftar Sekarang
             </span>
             <span className="bg-violet-500 group-hover:bg-violet-400 text-white w-16 h-16 rounded-full flex items-center justify-center -ml-3 shadow-xl shadow-violet-500/30 transition-all group-hover:-translate-y-1 group-hover:scale-110 border-2 border-violet-400/20">
               <ArrowRight size={20} strokeWidth={3}/>
