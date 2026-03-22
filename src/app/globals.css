@@ -2,10 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ======================================================= */
+/* LogFi Design System V2 — "Masterpiece Edition"          */
+/* ======================================================= */
+
 :root {
-  --background: #09090b;
+  --bg-primary: #0A0A0B;
+  --bg-secondary: #111113;
+  --bg-glass: rgba(255,255,255,0.03);
+  --accent: #8B5CF6;
+  --accent-glow: rgba(139,92,246,0.15);
+  --accent-warm: #F97316;
+  --text-primary: #F4F4F5;
+  --text-secondary: #A1A1AA;
+  --text-ghost: #52525B;
+  --border: rgba(255,255,255,0.06);
+  --emerald: #10B981;
+  --rose: #F43F5E;
+  --gradient-hero: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
+  --background: #0A0A0B;
   --foreground: #fafafa;
 }
+
+html { scroll-behavior: smooth; }
 
 body {
   color: var(--foreground);
@@ -13,14 +32,48 @@ body {
   overflow-x: hidden;
 }
 
-/* Glassmorphism utility */
+/* ========== ATMOSPHERIC: Dot-Grid Texture ========== */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ========== ATMOSPHERIC: Noise Grain Overlay ========== */
+.noise-overlay::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ========== ATMOSPHERIC: Animated Gradient Orbs ========== */
+@keyframes orbDrift1 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(60px,-40px) scale(1.05); }
+  66% { transform: translate(-30px,30px) scale(0.95); }
+}
+@keyframes orbDrift2 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(-50px,50px) scale(1.1); }
+  66% { transform: translate(40px,-20px) scale(0.9); }
+}
+@keyframes orbDrift3 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(30px,60px) scale(1.05); }
+}
+
+/* ========== Glassmorphism ========== */
 .glass {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 .glass-dark {
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(12px);
@@ -28,21 +81,232 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.glass-light {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+/* ========== Scrollbar ========== */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* ======================================================= */
+/* SCROLL-TRIGGERED ANIMATIONS                             */
+/* ======================================================= */
+
+.anim-hidden {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.anim-hidden.anim-show { opacity: 1; transform: translateY(0); }
+
+.anim-hidden-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.anim-hidden-left.anim-show { opacity: 1; transform: translateX(0); }
+
+.anim-hidden-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.anim-hidden-right.anim-show { opacity: 1; transform: translateX(0); }
+
+.anim-hidden-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.anim-hidden-scale.anim-show { opacity: 1; transform: scale(1); }
+
+/* Stagger delays */
+.anim-delay-1 { transition-delay: 100ms; }
+.anim-delay-2 { transition-delay: 200ms; }
+.anim-delay-3 { transition-delay: 300ms; }
+.anim-delay-4 { transition-delay: 400ms; }
+.anim-delay-5 { transition-delay: 500ms; }
+.anim-delay-6 { transition-delay: 600ms; }
+.anim-delay-7 { transition-delay: 700ms; }
+.anim-delay-8 { transition-delay: 800ms; }
+
+/* ======================================================= */
+/* LOOPING ANIMATIONS                                       */
+/* ======================================================= */
+
+/* Float */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-14px); }
+}
+.animate-float { animation: float 6s ease-in-out infinite; }
+
+/* Gradient text shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.text-shimmer {
+  background: linear-gradient(90deg, #8B5CF6, #6366F1, #3B82F6, #A78BFA, #8B5CF6);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+/* Infinite scroll carousels */
+@keyframes scrollCarousel {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.animate-scroll-left {
+  animation: scrollCarousel 45s linear infinite;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+.animate-scroll-left:hover { animation-play-state: paused; }
+
+@keyframes scrollCarouselReverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.1);
+.animate-scroll-right {
+  animation: scrollCarouselReverse 50s linear infinite;
+}
+.animate-scroll-right:hover { animation-play-state: paused; }
+
+/* Typewriter */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+.typewriter-text {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--accent);
+  animation: typing 2.5s steps(30) 1s forwards, blink 0.7s step-end infinite;
+  width: 0;
+}
+
+/* CTA pulse */
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+  50% { box-shadow: 0 0 24px 6px rgba(139, 92, 246, 0.12); }
+}
+.animate-cta-pulse { animation: ctaPulse 3s ease-in-out infinite; }
+
+/* Pop-in for badges */
+@keyframes popIn {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  80% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.animate-pop-in { animation: popIn 0.5s ease-out forwards; }
+
+/* ======================================================= */
+/* CARD GLOW BORDER (loggd.life inspired)                  */
+/* ======================================================= */
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent 40%, rgba(139,92,246,0.4) 50%, transparent 60%);
+  background-size: 300% 300%;
+  background-position: 0% 0%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease, background-position 0.5s ease;
+  pointer-events: none;
+}
+.card-glow:hover::before {
+  opacity: 1;
+  background-position: 100% 100%;
+}
+
+/* ======================================================= */
+/* BUTTON SHIMMER SWEEP                                     */
+/* ======================================================= */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+@keyframes shimmerSweep {
+  0% { left: -120%; }
+  100% { left: 120%; }
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.btn-shimmer:hover::after {
+  animation: shimmerSweep 0.7s ease-out;
+}
+
+/* ======================================================= */
+/* LINK UNDERLINE SLIDE                                     */
+/* ======================================================= */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* ======================================================= */
+/* PERSPECTIVE / 3D                                         */
+/* ======================================================= */
+.perspective-tilt {
+  transform: perspective(1200px) rotateY(-5deg) rotateX(3deg);
+  transition: transform 0.8s ease-out;
+}
+.perspective-tilt.straightened {
+  transform: perspective(1200px) rotateY(0deg) rotateX(0deg);
+}
+
+/* ======================================================= */
+/* WORD REVEAL ANIMATION                                    */
+/* ======================================================= */
+@keyframes wordReveal {
+  from { opacity: 0; transform: translateY(18px) rotateX(-10deg); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) rotateX(0deg); filter: blur(0); }
+}
+.word-reveal {
+  display: inline-block;
+  opacity: 0;
+  animation: wordReveal 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* ======================================================= */
+/* SECTION ATMOSPHERIC DIVIDER                              */
+/* ======================================================= */
+.section-glow-divider {
+  height: 200px;
+  background: radial-gradient(ellipse at center, rgba(139,92,246,0.04) 0%, transparent 70%);
+  pointer-events: none;
 }

@@ -1,5 +1,5 @@
 "use client";
-import EliteMain from "@/app/page";
+import LogFiApp from "@/app/page";
 export default function DiagnosticPage() {
-  return <EliteMain />;
+  return <LogFiApp />;
 }

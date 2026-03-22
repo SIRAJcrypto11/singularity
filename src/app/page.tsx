@@ -21,7 +21,7 @@ import {
 
 function cn(...classes: (string | false | undefined | null)[]) { return classes.filter(Boolean).join(' '); }
 
-export default function SingularityElite() {
+export default function LogFiApp() {
   const [theme, setTheme] = useState("dark");
   const [view, setView] = useState("dashboard");
   const [taskFilter, setTaskFilter] = useState("my-day");
@@ -31,6 +31,12 @@ export default function SingularityElite() {
   const [finance, setFinance] = useState<any>({ transactions: [], accounts: [], categories: [], debts: [], customLists: ['Personal','Work'] });
   const [habits, setHabits] = useState<any[]>([]);
   const [dailyLogs, setDailyLogs] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const [authMode, setAuthMode] = useState<'login'|'register'>('login');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [input, setInput] = useState("");
   const [status, setStatus] = useState("");
   const [showAddTask, setShowAddTask] = useState(false);
@@ -62,15 +68,58 @@ export default function SingularityElite() {
   }, []);
   
   useEffect(() => { 
-    fetchData(); 
-    const savedTheme = localStorage.getItem('singularity-theme');
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get('/api/auth/me');
+        if (res.data.authenticated) {
+          setUser(res.data.user);
+          fetchData(); 
+        }
+      } catch (e) {
+        setUser(null);
+      } finally {
+        setIsDataLoaded(true);
+      }
+    };
+    checkAuth();
+    const savedTheme = localStorage.getItem('logfi-theme');
     if (savedTheme) setTheme(savedTheme);
   }, [fetchData]);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError("");
+    setAuthSuccess("");
+    const email = (e.target as any).email.value;
+    const password = (e.target as any).password.value;
+
+    try {
+      if (authMode === 'login') {
+        const res = await axios.post('/api/auth/login', { email, password });
+        setUser(res.data.user);
+        fetchData();
+      } else {
+        const res = await axios.post('/api/auth/register', { email, password });
+        setAuthSuccess(res.data.message);
+      }
+    } catch (err: any) {
+      setAuthError(err.response?.data?.error || "Authentication failed");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    // For now, just clear state. In production, clear the cookie via API.
+    setUser(null);
+    document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  };
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
-    localStorage.setItem('singularity-theme', next);
+    localStorage.setItem('logfi-theme', next);
   };
 
   const isDark = theme === "dark";
@@ -197,13 +246,27 @@ export default function SingularityElite() {
 
   const goTask = (f: string) => { setView("tasks"); setTaskFilter(f); setSelectedTask(null); };
 
+  if (!isDataLoaded) return <div className={cn("h-screen flex items-center justify-center", isDark ? "bg-[#070708]" : "bg-white")}><RefreshCw className="animate-spin text-violet-500"/></div>;
+
   return (
     <div className={cn("flex h-screen font-sans overflow-hidden transition-colors duration-300", tc.bg, tc.text)}>
+      {!user && (
+        <AuthOverlay 
+          mode={authMode} 
+          setMode={setAuthMode} 
+          onSubmit={handleAuth} 
+          loading={authLoading} 
+          error={authError} 
+          success={authSuccess}
+          isDark={isDark}
+          tc={tc}
+        />
+      )}
       {/* SIDEBAR */}
       <aside className={cn("w-72 border-r flex flex-col pt-7 pb-5 shrink-0 transition-all", tc.border, tc.side)}>
         <div className="px-6 mb-8 flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-xl border border-white/10"><Bot size={22} className="text-white"/></div>
-          <div><h1 className={cn("text-lg font-black tracking-tighter leading-none", isDark?"text-white":"text-black")}>SINGULARITY</h1><p className="text-[9px] text-violet-400 font-bold uppercase tracking-[0.2em] mt-0.5">Elite V7</p></div>
+          <div><h1 className={cn("text-lg font-black tracking-tighter leading-none", isDark?"text-white":"text-black")}>Log<span className="text-violet-500">Fi</span></h1><p className="text-[9px] text-violet-400 font-bold uppercase tracking-[0.2em] mt-0.5">Daily Assistant</p></div>
         </div>
         <div className="flex-1 px-3 space-y-6 overflow-y-auto">
           <nav className="space-y-0.5"><SB active={view==="dashboard"} onClick={()=>{setView("dashboard");setSelectedTask(null);}} icon={<LayoutDashboard size={17}/>} label="Dashboard" tc={tc}/></nav>
@@ -243,9 +306,21 @@ export default function SingularityElite() {
               {isDark ? <><Sun size={12}/> Light</> : <><Moon size={12}/> Dark</>}
             </button>
           </div>
-          <div className={cn("p-2.5 border rounded-xl flex items-center gap-2.5", isDark?"bg-white/[0.02] border-white/5":"bg-white border-zinc-200 shadow-sm")}>
-            <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-[9px] font-bold text-violet-400 border border-white/10">SN</div>
-            <p className={cn("text-[10px] font-black truncate", isDark?"text-white":"text-black")}>SNISHOP Admin</p>
+          <div className={cn("p-2.5 border rounded-xl flex flex-col gap-3", isDark?"bg-white/[0.02] border-white/5":"bg-white border-zinc-200 shadow-sm")}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-full bg-violet-600/20 flex items-center justify-center text-[9px] font-bold text-violet-400 border border-violet-500/20">
+                {user?.email?.[0].toUpperCase() || "S"}
+              </div>
+              <p className={cn("text-[10px] font-black truncate flex-1", isDark?"text-white":"text-black")}>
+                {user?.email || "Guest Sentinel"}
+              </p>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="w-full py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-[9px] font-black uppercase tracking-tighter rounded-lg border border-rose-500/20 transition-all flex items-center justify-center gap-1.5"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </aside>
@@ -536,7 +611,7 @@ function HabitTrackerView({ habits, handleToggleHabit, handleAddHabit, todayStr,
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <div><h1 className={cn("text-3xl font-black tracking-tighter", isDark?"text-white":"text-black")}>Behavioral Pulse</h1><p className={cn("text-xs font-bold mt-1", tc.textMuted)}>Consistency is the key to Singularity.</p></div>
+        <div><h1 className={cn("text-3xl font-black tracking-tighter", isDark?"text-white":"text-black")}>Behavioral Pulse</h1><p className={cn("text-xs font-bold mt-1", tc.textMuted)}>Consistency is the key to growth.</p></div>
         <div className="flex gap-2">
           <input value={newHabit} onChange={e=>setNewHabit(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){handleAddHabit(newHabit);setNewHabit("");}}} placeholder="Write new habit..." className={cn("bg-transparent border rounded-lg px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-violet-500/50 focus:outline-none", tc.border)}/>
           <button onClick={()=>{handleAddHabit(newHabit);setNewHabit("");}} className="px-4 py-2 bg-violet-600 rounded-lg text-xs font-black text-white hover:bg-violet-500 shadow-lg">Add Habit</button>
@@ -842,3 +917,78 @@ function TR({task,onToggle,onClick,tc,isDark}:any){return<div onClick={onClick} 
 function AttrBox({label,icon,children,isDark}:any){return<div className={cn("border rounded-xl p-3.5 space-y-1.5", isDark?"bg-white/[0.02] border-white/5":"bg-zinc-50 border-zinc-200")}><p className="text-[8px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-1">{icon}{label}</p>{children}</div>;}
 
 function Modal({onClose,title,children,isDark}:any){return<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center" onClick={onClose}><div onClick={(e:any)=>e.stopPropagation()} className={cn("border rounded-2xl p-6 w-[380px] space-y-4 shadow-2xl animate-in zoom-in-95", isDark?"bg-zinc-900 border-white/10":"bg-white border-zinc-200")}><div className="flex justify-between items-center"><h3 className={cn("text-base font-black uppercase tracking-tight", isDark?"text-white":"text-black")}>{title}</h3><button onClick={onClose} className="text-zinc-500 hover:text-black transition-colors"><X size={18}/></button></div>{children}</div></div>;}
+
+function AuthOverlay({ mode, setMode, onSubmit, loading, error, success, isDark, tc }: any) {
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 backdrop-blur-xl bg-black/60">
+      <div className={cn("w-full max-w-md rounded-3xl border p-8 space-y-8 shadow-2xl transition-all", tc.card)}>
+        <div className="text-center space-y-2">
+          <div className="w-16 h-16 bg-violet-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <Bot className="text-white" size={32} />
+          </div>
+          <h2 className={cn("text-2xl font-black tracking-tighter", isDark ? "text-white" : "text-black")}>
+            Log<span className="text-violet-500">Fi</span>
+          </h2>
+          <p className={tc.textMuted + " text-xs font-bold uppercase tracking-widest"}>
+            {mode === 'login' ? 'Selamat Datang Kembali' : 'Buat Akun LogFi Gratis'}
+          </p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-50">Email Address</label>
+            <input 
+              name="email" 
+              type="email" 
+              required 
+              placeholder="name@company.com"
+              className={cn("w-full px-4 py-3 rounded-xl border text-sm font-bold focus:ring-2 focus:ring-violet-500 transition-all outline-none", 
+                isDark ? "bg-white/5 border-white/10 text-white" : "bg-zinc-50 border-zinc-200 text-black")}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-widest ml-1 opacity-50">Secure Password</label>
+            <input 
+              name="password" 
+              type="password" 
+              required 
+              placeholder="••••••••"
+              className={cn("w-full px-4 py-3 rounded-xl border text-sm font-bold focus:ring-2 focus:ring-violet-500 transition-all outline-none", 
+                isDark ? "bg-white/5 border-white/10 text-white" : "bg-zinc-50 border-zinc-200 text-black")}
+            />
+          </div>
+
+          {error && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-[9px] font-black uppercase text-center tracking-widest">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-black uppercase text-center tracking-widest">
+              {success}
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full py-4 bg-violet-600 hover:bg-violet-500 text-white rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-violet-500/20 transition-all flex items-center justify-center gap-2"
+          >
+            {loading ? <RefreshCw className="animate-spin" size={16} /> : (mode === 'login' ? 'Unlock Access' : 'Create Account')}
+          </button>
+        </form>
+
+        <div className="text-center pt-4">
+          <button 
+            type="button"
+            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+            className={cn("text-[10px] font-black uppercase tracking-widest transition-colors", tc.textMuted, "hover:text-violet-500")}
+          >
+            {mode === 'login' ? "Don't have access? Request Invitation" : "Already an Elite? Secure Sign In"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -91,7 +91,7 @@ export function exportIncomeStatementPDF(income: number, expense: number, catego
   doc.setTextColor(150, 150, 150);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
-  doc.text('Dokumen ini digenerate secara otomatis oleh Singularity ERP System', pw / 2, ph - 10, { align: 'center' });
+  doc.text('Dokumen ini digenerate secara otomatis oleh LogFi Daily Assistant', pw / 2, ph - 10, { align: 'center' });
 
   doc.save(`Laporan_LabaRugi_${period.replace(/\s/g,'_')}.pdf`);
 }

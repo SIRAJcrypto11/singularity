@@ -1,54 +1,21 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import os from 'os';
-
-// Safely persist DB in the user's home directory (e.g. C:\Users\Username\.singularity_v7_db.json)
-const DB_PATH = path.join(os.homedir(), '.singularity_v7_db.json');
-
-async function ensureDb() {
-  try {
-    const exists = await fs.access(DB_PATH).then(() => true).catch(() => false);
-    if (!exists) {
-      const initialData = {
-        tasks: [],
-        finance: {
-          transactions: [],
-          accounts: [
-            { id: 'acc-main', name: 'Main Wallet', balance: 0, type: 'wallet', color: 'violet' }
-          ],
-          categories: [
-            { id: 'cat-inc-1', name: 'Penjualan', type: 'income', color: 'emerald' },
-            { id: 'cat-inc-2', name: 'Gaji', type: 'income', color: 'blue' },
-            { id: 'cat-exp-1', name: 'Makan', type: 'expense', color: 'rose' },
-            { id: 'cat-exp-2', name: 'Transport', type: 'expense', color: 'amber' }
-          ],
-          debts: [],
-          customLists: ['Personal', 'Work']
-        },
-        habits: [],
-        dailyLogs: []
-      };
-      await fs.writeFile(DB_PATH, JSON.stringify(initialData, null, 2));
-    }
-  } catch (err) {
-    console.error("DB Init failed", err);
-  }
-}
+import { ensureDb, readDb, writeDb } from '@/lib/db-server';
 
 export async function GET() {
   await ensureDb();
-  const data = await fs.readFile(DB_PATH, 'utf-8');
-  let parsed = JSON.parse(data);
+  let parsed = await readDb();
+  
   if (Array.isArray(parsed.finance)) {
     parsed.finance = {
       transactions: parsed.finance,
       accounts: [{ id: 'acc-main', name: 'Main Wallet', balance: 0, type: 'wallet', color: 'violet' }],
       categories: [], debts: [], customLists: ['Personal', 'Work']
     };
-    await fs.writeFile(DB_PATH, JSON.stringify(parsed, null, 2));
+    await writeDb(parsed);
   }
+  
   if (!parsed.finance.customLists) parsed.finance.customLists = ['Personal', 'Work'];
+  
   if (!parsed.finance.categories || parsed.finance.categories.length === 0) {
     parsed.finance.categories = [
       { id: 'cat-inc-1', name: 'Penjualan', type: 'income', color: 'emerald', keywords: ['penjualan','jual','sales'] },
@@ -60,10 +27,13 @@ export async function GET() {
       { id: 'cat-exp-4', name: 'Tagihan', type: 'expense', color: 'orange', keywords: ['tagihan','listrik','wifi','token','pulsa','internet'] },
       { id: 'cat-exp-5', name: 'Hiburan', type: 'expense', color: 'violet', keywords: ['hiburan','nonton','game','langganan'] }
     ];
-    await fs.writeFile(DB_PATH, JSON.stringify(parsed, null, 2));
+    await writeDb(parsed);
   }
+  
   if (!parsed.habits) parsed.habits = [];
   if (!parsed.dailyLogs) parsed.dailyLogs = [];
+  if (!parsed.users) parsed.users = [];
+  
   return NextResponse.json(parsed);
 }
 
@@ -71,10 +41,12 @@ export async function POST(req: Request) {
   try {
     await ensureDb();
     const payload = await req.json();
-    const currentData = JSON.parse(await fs.readFile(DB_PATH, 'utf-8'));
+    const currentData = await readDb();
+    
     if (Array.isArray(currentData.finance)) {
       currentData.finance = { transactions: currentData.finance, accounts: [], categories: [], debts: [], customLists: ['Personal', 'Work'] };
     }
+    
     if (!currentData.finance.customLists) currentData.finance.customLists = ['Personal', 'Work'];
 
     const { type, data } = payload;
@@ -171,7 +143,7 @@ export async function POST(req: Request) {
         break;
     }
 
-    await fs.writeFile(DB_PATH, JSON.stringify(currentData, null, 2));
+    await writeDb(currentData);
     return NextResponse.json({ success: true, data: currentData });
   } catch (error) {
     console.error("POST Error", error);
